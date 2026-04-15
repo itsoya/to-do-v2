@@ -4,6 +4,10 @@ import {ref} from 'vue';
 const newTask = ref("");
 const tasks = ref([
   {id:1,text: "call mom", completed: false, favorite: false },
+  {id:2,text: "buy groceries", completed: false, favorite: false },
+  {id:3,text: "finish project", completed: false, favorite: false },
+  {id:4,text: "exercise", completed: false, favorite: false },
+  {id:5,text: "read a book", completed: false, favorite: false },
 ]);
 function addTask(){
   const text = newTask.value.trim()
@@ -21,6 +25,32 @@ function addTask(){
 function deleteTask(id: number){
   tasks.value = tasks.value.filter((t) => t.id !=id)
 };
+const editingId = ref(null);
+const editingBuffer = ref("");
+function startEdit(task){
+  editingId.value = task.id;
+  editingBuffer.value = task.text;
+}
+
+function cancelEdit(){
+  editingId.value = null
+  editingBuffer.value = ""
+}
+function finishEdit(task){
+  if(editingId.value !== task.id){
+    return;
+  }
+  const trimmed = editingBuffer.value.trim()
+  if(!trimmed){
+    deleteTask(task)
+  }else{
+    task.text = trimmed
+  }
+function favoriteTask(task){
+  task.favorite = !task.favorite
+}
+  cancelEdit();
+}
 
 </script>
 
@@ -33,10 +63,18 @@ function deleteTask(id: number){
   </div>
   <div>
     <ul class="task-list">
-      <li v-for="task in tasks" :key="task.id" :class="{done: task.completed}">
-        <button class="delete" @click="deleteTask(task.id)">X</button>
-        <input type="checkbox" v-model="task.completed"/>
-        <span>{{task.text}}</span>
+      <li v-for="task in tasks" :key="task.id" :class="{done: task.completed, editing: editingId === task.id}">
+        <template v-if="editingId === task.id">
+          <input class="edit-input" type="text" v-model="editingBuffer"
+           @keyup.enter="finishEdit(task)" @blur="finishEdit(task)"
+           @keydown.esc="cancelEdit"/>
+        </template>
+        <template v-else>
+          <button class="delete" @click="deleteTask(task.id)">X</button>
+          <button class="favorite" @click="task.favorite = !task.favorite">{{task.favorite ? "★" : "☆"}}</button>
+          <input type="checkbox" v-model="task.completed"/>
+          <span @click="startEdit(task)">{{task.text}}</span>
+        </template>
       </li>
     </ul>
   </div>
@@ -94,5 +132,19 @@ button {
   transition: 0.5s;
   background: #932d2d;
 }
-
+.edit-input {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #191616;
+}
+.favorite {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.favorite:hover {
+  color: #f39c12;
+}
 </style>
