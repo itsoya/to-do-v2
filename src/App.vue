@@ -27,7 +27,7 @@ function deleteTask(id: number){
 };
 const editingId = ref(null);
 const editingBuffer = ref("");
-function startEdit(task){
+function startEdit(task: any){
   editingId.value = task.id;
   editingBuffer.value = task.text;
 }
@@ -36,7 +36,7 @@ function cancelEdit(){
   editingId.value = null
   editingBuffer.value = ""
 }
-function finishEdit(task){
+function finishEdit(task: any){
   if(editingId.value !== task.id){
     return;
   }
@@ -46,7 +46,7 @@ function finishEdit(task){
   }else{
     task.text = trimmed
   }
-function favoriteTask(task){
+function favoriteTask(task: any){
   task.favorite = !task.favorite
 }
   cancelEdit();
@@ -88,7 +88,7 @@ onMounted(() => {
   <h1>To Do App</h1>
   <div class="input-row">
     <input type="text" placeholder="search tasks" v-model="search"/>
-    <select v-model="currentFilter" @change="currentFilter = $event.target.value">
+    <select v-model="currentFilter">
       <option v-for="filter in filters" :key="filter.name" :value="filter.name">{{filter.label}}</option>
     </select>
   </div>
