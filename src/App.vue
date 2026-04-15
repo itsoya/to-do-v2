@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {ref,computed} from 'vue';
+import {ref,computed,watch,onMounted} from 'vue';
 const newTask = ref("");
 const tasks = ref([
   {id:1,text: "call mom", completed: false, favorite: false },
@@ -71,6 +71,15 @@ const filteredTasks = computed(() => {
     }
     return true;
   }).filter((t) => t.text.toLowerCase().includes(search.value.toLowerCase()));
+});
+watch(tasks, () => {
+  localStorage.setItem("tasks", JSON.stringify(tasks.value));
+}, {deep: true});
+onMounted(() => {
+  const saved = localStorage.getItem("tasks");
+  if(saved){
+    tasks.value = JSON.parse(saved);
+  }
 });
 </script>
 
