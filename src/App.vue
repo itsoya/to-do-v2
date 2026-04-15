@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {ref} from 'vue';
+import {ref,computed} from 'vue';
 const newTask = ref("");
 const tasks = ref([
   {id:1,text: "call mom", completed: false, favorite: false },
@@ -51,19 +51,45 @@ function favoriteTask(task){
 }
   cancelEdit();
 }
-
+const search = ref("");
+const currentFilter = ref("all");
+const filters = [
+  {name: "all", label: "All"},
+  {name: "active", label: "Active"},
+  {name: "completed", label: "Completed"},
+  {name: "favorite", label: "Favorite"},
+];
+const filteredTasks = computed(() => {
+  return tasks.value.filter((t) => t.text.toLowerCase().includes(search.value.toLowerCase()))
+    .filter((t) => {
+    if(currentFilter.value === "active"){
+      return !t.completed;
+    }else if(currentFilter.value === "completed"){
+      return t.completed;
+    }else if(currentFilter.value === "favorite"){
+      return t.favorite;
+    }
+    return true;
+  }).filter((t) => t.text.toLowerCase().includes(search.value.toLowerCase()));
+});
 </script>
 
 <template>
  <div class="app">
   <h1>To Do App</h1>
   <div class="input-row">
+    <input type="text" placeholder="search tasks" v-model="search"/>
+    <select v-model="currentFilter" @change="currentFilter = $event.target.value">
+      <option v-for="filter in filters" :key="filter.name" :value="filter.name">{{filter.label}}</option>
+    </select>
+  </div>
+  <div class="input-row">
     <input type="text" placeholder="add task here" v-model="newTask"/>
     <button @click="addTask">Add</button>
   </div>
   <div>
     <ul class="task-list">
-      <li v-for="task in tasks" :key="task.id" :class="{done: task.completed, editing: editingId === task.id}">
+      <li v-for="task in filteredTasks" :key="task.id" :class="{done: task.completed, editing: editingId === task.id}">
         <template v-if="editingId === task.id">
           <input class="edit-input" type="text" v-model="editingBuffer"
            @keyup.enter="finishEdit(task)" @blur="finishEdit(task)"
