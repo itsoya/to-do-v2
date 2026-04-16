@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {ref,computed,watch,onMounted} from 'vue';
+import {ref,computed,watch,onMounted } from 'vue';
 const newTask = ref("");
 
 // Dummy data
@@ -12,13 +12,15 @@ const tasks = ref([
   {id:5,text: "read a book", completed: false, favorite: false },
 ]);
 
-// Add task function
+// Add task function, takes the value of newTask, trims it, and if it's not empty, 
+// it pushes a new task object into the tasks array with a unique id, the text from newTask, 
+// and default values for completed and favorite properties. Finally, it resets newTask to an empty string.
 function addTask(){
   const text = newTask.value.trim()
   if(!text){return;}
   
   tasks.value.push({
-    id: Date.now(),
+    id: Math.max(...tasks.value.map(t => t.id), 0) + 1,
     text: text,
     completed: false,
     favorite: false,
