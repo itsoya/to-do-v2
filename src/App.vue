@@ -2,6 +2,8 @@
 
 import {ref,computed,watch,onMounted} from 'vue';
 const newTask = ref("");
+
+// Dummy data
 const tasks = ref([
   {id:1,text: "call mom", completed: false, favorite: false },
   {id:2,text: "buy groceries", completed: false, favorite: false },
@@ -9,6 +11,8 @@ const tasks = ref([
   {id:4,text: "exercise", completed: false, favorite: false },
   {id:5,text: "read a book", completed: false, favorite: false },
 ]);
+
+// Add task function
 function addTask(){
   const text = newTask.value.trim()
   if(!text){return;}
@@ -22,6 +26,8 @@ function addTask(){
   });
   newTask.value=""
 };
+
+// Delete task function, takes id as parameter and filters out the task with that id from the tasks array.
 function deleteTask(id: number){
   tasks.value = tasks.value.filter((t) => t.id !=id)
 };
@@ -32,10 +38,14 @@ function startEdit(task: any){
   editingBuffer.value = task.text;
 }
 
+// cancel edit function, resets the editingId and editingBuffer to null and empty string respectively, effectively canceling the edit operation.
 function cancelEdit(){
   editingId.value = null
   editingBuffer.value = ""
 }
+// Finish edit function, checks if the task being edited is the same as the one passed as a parameter. 
+// If it is, it trims the editing buffer and checks if it's empty. If it's empty, it deletes the task; otherwise, 
+// it updates the task's text with the trimmed value. Finally, it calls cancelEdit to reset the editing state.
 function finishEdit(task: any){
   if(editingId.value !== task.id){
     return;
@@ -59,6 +69,9 @@ const filters = [
   {name: "completed", label: "Completed"},
   {name: "favorite", label: "Favorite"},
 ];
+// Filter task function, filters the tasks based on the current filter and search query. 
+// It first filters the tasks based on the search query, then applies the selected filter
+//  (active, completed, favorite) to further narrow down the results.
 const filteredTasks = computed(() => {
   return tasks.value.filter((t) => t.text.toLowerCase().includes(search.value.toLowerCase()))
     .filter((t) => {
@@ -72,9 +85,11 @@ const filteredTasks = computed(() => {
     return true;
   }).filter((t) => t.text.toLowerCase().includes(search.value.toLowerCase()));
 });
+// Watcher for tasks, watches the tasks array for changes and updates the local storage with the new tasks array whenever it changes.
 watch(tasks, () => {
   localStorage.setItem("tasks", JSON.stringify(tasks.value));
 }, {deep: true});
+// On mounted hook, retrieves the tasks from local storage when the component is mounted and sets the tasks array to the retrieved value if it exists.
 onMounted(() => {
   const saved = localStorage.getItem("tasks");
   if(saved){
