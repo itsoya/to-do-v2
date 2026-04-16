@@ -33,6 +33,9 @@ function deleteTask(id: number){
 };
 const editingId = ref(null);
 const editingBuffer = ref("");
+
+// Start edit function, takes a task as a parameter and sets the editingId to 
+// the task's id and the editingBuffer to the task's text, allowing the user to edit the task's text.
 function startEdit(task: any){
   editingId.value = task.id;
   editingBuffer.value = task.text;
@@ -43,6 +46,7 @@ function cancelEdit(){
   editingId.value = null
   editingBuffer.value = ""
 }
+
 // Finish edit function, checks if the task being edited is the same as the one passed as a parameter. 
 // If it is, it trims the editing buffer and checks if it's empty. If it's empty, it deletes the task; otherwise, 
 // it updates the task's text with the trimmed value. Finally, it calls cancelEdit to reset the editing state.
@@ -56,6 +60,9 @@ function finishEdit(task: any){
   }else{
     task.text = trimmed
   }
+
+  // Favorite task function, takes a task as a parameter and toggles the 
+  // favorite property of the task, allowing the user to mark or unmark a task as a favorite.
 function favoriteTask(task: any){
   task.favorite = !task.favorite
 }
@@ -69,6 +76,7 @@ const filters = [
   {name: "completed", label: "Completed"},
   {name: "favorite", label: "Favorite"},
 ];
+
 // Filter task function, filters the tasks based on the current filter and search query. 
 // It first filters the tasks based on the search query, then applies the selected filter
 //  (active, completed, favorite) to further narrow down the results.
@@ -85,10 +93,12 @@ const filteredTasks = computed(() => {
     return true;
   }).filter((t) => t.text.toLowerCase().includes(search.value.toLowerCase()));
 });
+
 // Watcher for tasks, watches the tasks array for changes and updates the local storage with the new tasks array whenever it changes.
 watch(tasks, () => {
   localStorage.setItem("tasks", JSON.stringify(tasks.value));
 }, {deep: true});
+
 // On mounted hook, retrieves the tasks from local storage when the component is mounted and sets the tasks array to the retrieved value if it exists.
 onMounted(() => {
   const saved = localStorage.getItem("tasks");
